@@ -72,36 +72,39 @@ Builds a Markdown/YAML document with a frontmatter header and a body. Useful for
 
 Inputs:
 - `body` *(required, multiline)* — content placed after the closing `---`.
-- `categories` *(optional)* — comma-separated, emitted as a flow-style list.
-- `models` *(optional)* — comma-separated, emitted as a flow-style list.
-- `loras` *(optional, multiline)* — one `name:weight` per line. Lines starting with `#` are skipped; lines without `:` default to weight `1.0`.
-- `negative` *(optional)* — emitted as a quoted string when it contains special characters.
+- `categories` *(optional)* — comma-separated; each item is emitted as a double-quoted entry in a flow-style list.
+- `models` *(optional)* — comma-separated; each item is emitted as a double-quoted entry in a flow-style list.
+- `loras` *(optional, multiline)* — one `name:weight` per line. Lines starting with `#` are skipped; lines without `:` default to weight `1.0`. `name` is double-quoted.
+- `negative` *(optional, multiline)* — internal newlines are collapsed to single spaces, trimmed, then emitted as a double-quoted string.
+- `created_at` *(optional)* — an ISO 8601 datetime string. Emitted **unquoted** so YAML parsers read it as a native timestamp. Designed to be wired from **CR DateTime** with format `[time(%Y-%m-%dT%H:%M:%S)]`.
 
 Any empty optional field is omitted from the output.
 
 Example inputs:
 - `categories`: `hands, girl`
-- `models`: `anima`
+- `models`: `Anima Base 1.0`
 - `loras`:
   ```
   gpt-style:0.8
   ```
 - `negative`: `blurry, lowres, deformed`
+- `created_at`: `2026-06-23T14:30:05` *(typically wired from CR DateTime)*
 - `body`: `cinematic portrait, 1girl, head tilt, neutral expression, slightly parted lips, looking at the man, soft blush`
 
 Output:
 ```yaml
 ---
-categories: [hands, girl]
-models: [anima]
+categories: ["hands", "girl"]
+models: ["Anima Base 1.0"]
 loras:
-  - { name: gpt-style, weight: 0.8 }
+  - { name: "gpt-style", weight: 0.8 }
 negative: "blurry, lowres, deformed"
+created_at: 2026-06-23T14:30:05
 ---
 cinematic portrait, 1girl, head tilt, neutral expression, slightly parted lips, looking at the man, soft blush
 ```
 
-Typical pipeline: **CR Yaml Frontmatter** → **CR Text Hash** (hash the body for a filename) → **CR Save Text To File** with `file_extension = md`.
+Typical pipeline: **CR DateTime** (`[time(%Y-%m-%dT%H:%M:%S)]`) → `created_at` of **CR Yaml Frontmatter** → **CR Text Hash** (hash the body for a filename) → **CR Save Text To File** with `file_extension = md`.
 
 # List of Custom Nodes
   
