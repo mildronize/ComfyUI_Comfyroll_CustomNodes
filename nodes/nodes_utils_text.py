@@ -417,7 +417,7 @@ class CR_YamlFrontmatter:
                 "categories": ("STRING", {"multiline": False, "default": ""}),
                 "models": ("STRING", {"multiline": False, "default": ""}),
                 "loras": ("STRING", {"multiline": True, "default": ""}),
-                "negative": ("STRING", {"multiline": False, "default": ""}),
+                "negative": ("STRING", {"multiline": True, "default": ""}),
             },
         }
 
@@ -431,10 +431,12 @@ class CR_YamlFrontmatter:
         return [p.strip() for p in s.split(",") if p.strip()]
 
     @staticmethod
-    def _yaml_escape(s):
-        if any(c in s for c in [':', '#', '"', "'", '\n', ',', '[', ']', '{', '}']):
-            return '"' + s.replace('\\', '\\\\').replace('"', '\\"') + '"'
-        return s
+    def _yaml_quote(s):
+        return '"' + s.replace('\\', '\\\\').replace('"', '\\"') + '"'
+
+    @classmethod
+    def _yaml_flow_list(cls, items):
+        return "[" + ", ".join(cls._yaml_quote(i) for i in items) + "]"
 
     def build(self, body, categories="", models="", loras="", negative=""):
 
@@ -444,11 +446,11 @@ class CR_YamlFrontmatter:
 
         cats = self._split_csv(categories)
         if cats:
-            lines.append("categories: [" + ", ".join(cats) + "]")
+            lines.append("categories: " + self._yaml_flow_list(cats))
 
         mdls = self._split_csv(models)
         if mdls:
-            lines.append("models: [" + ", ".join(mdls) + "]")
+            lines.append("models: " + self._yaml_flow_list(mdls))
 
         lora_entries = []
         for raw in loras.splitlines():
@@ -464,10 +466,11 @@ class CR_YamlFrontmatter:
         if lora_entries:
             lines.append("loras:")
             for name, weight in lora_entries:
-                lines.append("  - { name: " + name + ", weight: " + weight + " }")
+                lines.append("  - { name: " + self._yaml_quote(name) + ", weight: " + weight + " }")
 
         if negative:
-            lines.append("negative: " + self._yaml_escape(negative))
+            collapsed = re.sub(r'\s*\n\s*', ' ', negative).strip()
+            lines.append("negative: " + self._yaml_quote(collapsed))
 
         lines.append("---")
         text = "\n".join(lines) + "\n" + body
