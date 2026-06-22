@@ -40,6 +40,21 @@ Examples:
 
 Common pairing: feed into `file_name` of **CR Save Text To File**, or into a **CR Text Concatenate** to tag prompts with the time they were generated.
 
+### Safe formats for filenames
+
+Filenames must avoid `:`, `/`, `\`, and spaces (Windows rejects `:`; Unix treats `/` as a path separator; spaces are ugly in shells). Pick a format with only digits, hyphens, and underscores:
+
+| Format | Example | Notes |
+| --- | --- | --- |
+| `[time(%Y-%m-%d)]` | `2026-06-23` | Date only, universally safe. |
+| `[time(%Y%m%d_%H%M%S)]` | `20260623_143005` | **Recommended** for dated filenames — lexicographically sortable. |
+| `[time(%Y%m%dT%H%M%S)]` | `20260623T143005` | ISO-ish without separators. |
+| `[time(%Y%m%dT%H%M%S%z)]` | `20260623T143005+0700` | Include UTC offset when timezone matters. |
+
+Avoid these in filenames:
+- `%Y-%m-%dT%H:%M:%S` — true ISO 8601 contains `:`, invalid on Windows. Use it for the `created_at` YAML field instead, where `:` is fine.
+- `%c`, `%x`, `%X` — locale-dependent, may emit `/` or spaces.
+
 ## 🔤 CR Save Text To File
 
 Saves a multiline string to a file on disk.
