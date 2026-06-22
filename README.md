@@ -26,6 +26,20 @@ https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/blob/main/Patch_Notes.md
 
 # Usage: Custom Text Utility Nodes
 
+## 🔤 CR DateTime
+
+Outputs a formatted datetime string using WAS-style `[time(fmt)]` tokens, where `fmt` is any [`strftime`](https://docs.python.org/3/library/time.html#time.strftime) format string. Multiple tokens and surrounding literal text are supported. The node re-evaluates on every workflow run.
+
+Input:
+- `format` — default `[time(%Y-%m-%d %H:%M:%S)]`.
+
+Examples:
+- `[time(%Y-%m-%d)]` → `2026-06-23`
+- `[time(%Y-%m-%d %H:%M:%S)]` → `2026-06-23 14:30:05`
+- `run_[time(%Y%m%d_%H%M%S)]_v1` → `run_20260623_143005_v1`
+
+Common pairing: feed into `file_name` of **CR Save Text To File**, or into a **CR Text Concatenate** to tag prompts with the time they were generated.
+
 ## 🔤 CR Save Text To File
 
 Saves a multiline string to a file on disk.
