@@ -418,6 +418,7 @@ class CR_YamlFrontmatter:
                 "models": ("STRING", {"multiline": False, "default": ""}),
                 "loras": ("STRING", {"multiline": True, "default": ""}),
                 "negative": ("STRING", {"multiline": True, "default": ""}),
+                "created_at": ("STRING", {"multiline": False, "default": ""}),
             },
         }
 
@@ -438,7 +439,7 @@ class CR_YamlFrontmatter:
     def _yaml_flow_list(cls, items):
         return "[" + ", ".join(cls._yaml_quote(i) for i in items) + "]"
 
-    def build(self, body, categories="", models="", loras="", negative=""):
+    def build(self, body, categories="", models="", loras="", negative="", created_at=""):
 
         show_help = "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/wiki/List-Nodes#cr-yaml-frontmatter"
 
@@ -471,6 +472,9 @@ class CR_YamlFrontmatter:
         if negative:
             collapsed = re.sub(r'\s*\n\s*', ' ', negative).strip()
             lines.append("negative: " + self._yaml_quote(collapsed))
+
+        if created_at:
+            lines.append("created_at: " + created_at.strip())
 
         lines.append("---")
         text = "\n".join(lines) + "\n" + body
