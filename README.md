@@ -55,6 +55,25 @@ Avoid these in filenames:
 - `%Y-%m-%dT%H:%M:%S` — true ISO 8601 contains `:`, invalid on Windows. Use it for the `created_at` YAML field instead, where `:` is fine.
 - `%c`, `%x`, `%X` — locale-dependent, may emit `/` or spaces.
 
+### ISO 8601 formats
+
+ISO 8601 is the international standard for representing dates and times. Use these in YAML/JSON metadata fields and API payloads — **not** in filenames (the `:` separator is invalid on Windows).
+
+| Format | Example | Use case |
+| --- | --- | --- |
+| `[time(%Y-%m-%d)]` | `2026-06-23` | Date only. |
+| `[time(%H:%M:%S)]` | `14:30:05` | Time only. |
+| `[time(%Y-%m-%dT%H:%M:%S)]` | `2026-06-23T14:30:05` | **Recommended** local datetime — what to feed into `created_at` of CR Yaml Frontmatter. |
+| `[time(%Y-%m-%dT%H:%M:%S%z)]` | `2026-06-23T14:30:05+0700` | Datetime with UTC offset. Use when the consumer needs an unambiguous timezone. |
+| `[time(%Y-%m-%dT%H:%M:%SZ)]` | `2026-06-23T14:30:05Z` | "Zulu" / UTC datetime. Only correct if your system clock is UTC. |
+| `[time(%G-W%V-%u)]` | `2026-W26-2` | ISO week date (year-week-weekday). |
+| `[time(%Y-%j)]` | `2026-174` | Ordinal date (year-dayOfYear). |
+
+Notes:
+- The `T` between date and time is literal — `strftime` passes it through unchanged.
+- `%z` emits `+HHMM` (e.g. `+0700`); strict ISO 8601 wants `+HH:MM`. Most parsers accept both.
+- Python's `time.strftime` does not have a dedicated millisecond code. If you need sub-second precision, use a different tool — `[time(%Y-%m-%dT%H:%M:%S)]` is the most precise format this node supports.
+
 ## 🔤 CR Save Text To File
 
 Saves a multiline string to a file on disk.
