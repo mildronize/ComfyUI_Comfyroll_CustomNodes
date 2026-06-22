@@ -8,6 +8,7 @@ import csv
 import io
 import re
 import time
+import hashlib
 from ..categories import icons
 
 
@@ -369,6 +370,41 @@ class CR_TextLength:
         return (int_out, show_help, )
   
 #---------------------------------------------------------------------------------------------------------------------#
+class CR_TextHash:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "algorithm": (["sha256", "sha1", "sha512", "md5"],),
+                "length": ("INT", {"default": 0, "min": 0, "max": 128}),
+            },
+            "optional": {
+                "text1": ("STRING", {"multiline": False, "default": "", "forceInput": True}),
+                "text2": ("STRING", {"multiline": False, "default": "", "forceInput": True}),
+                "text3": ("STRING", {"multiline": False, "default": "", "forceInput": True}),
+                "text4": ("STRING", {"multiline": False, "default": "", "forceInput": True}),
+                "separator": ("STRING", {"multiline": False, "default": ""}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "STRING", )
+    RETURN_NAMES = ("hash", "show_help", )
+    FUNCTION = "hash_text"
+    CATEGORY = icons.get("Comfyroll/Utils/Text")
+
+    def hash_text(self, algorithm, length, text1="", text2="", text3="", text4="", separator=""):
+
+        show_help = "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/wiki/List-Nodes#cr-text-hash"
+
+        joined = separator.join([t for t in (text1, text2, text3, text4) if t != ""])
+        digest = hashlib.new(algorithm, joined.encode("utf-8")).hexdigest()
+        if length > 0:
+            digest = digest[:length]
+
+        return (digest, show_help, )
+
+#---------------------------------------------------------------------------------------------------------------------#
 # MAPPINGS
 #---------------------------------------------------------------------------------------------------------------------#
 # For reference only, actual mappings are in __init__.py
@@ -383,7 +419,8 @@ NODE_CLASS_MAPPINGS = {
     "CR Text Blacklist": CR_TextBlacklist,   
     "CR Text Length": CR_TextLength,    
     "CR Text Operation": CR_TextOperation, 
-    "CR Save Text To File": CR_SaveTextToFile,    
+    "CR Save Text To File": CR_SaveTextToFile,
+    "CR Text Hash": CR_TextHash,
 }
 '''
 
