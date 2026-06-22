@@ -6,7 +6,17 @@
 import os
 import csv
 import io
+import re
+import time
 from ..categories import icons
+
+
+def _parse_time_tokens(text):
+    return re.sub(
+        r'\[time\((.*?)\)\]',
+        lambda m: time.strftime(m.group(1), time.localtime(time.time())),
+        text,
+    )
 
 class AnyType(str):
     """A special type that can be connected to any other types. Credit to pythongosssss"""
@@ -162,13 +172,16 @@ class CR_SaveTextToFile:
     
         show_help =  "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/wiki/List-Nodes#cr-save-text-to-file" 
     
-        filepath = os.path.join(output_file_path, file_name + "." + file_extension)
- 
         index = 1
 
         if(output_file_path == "" or file_name == ""):
-            print(f"[Warning] CR Save Text List. No file details found. No file output.") 
+            print(f"[Warning] CR Save Text List. No file details found. No file output.")
             return ()
+
+        output_file_path = _parse_time_tokens(output_file_path)
+        file_name = _parse_time_tokens(file_name)
+        os.makedirs(output_file_path, exist_ok=True)
+        filepath = os.path.join(output_file_path, file_name + "." + file_extension)
 
         while os.path.exists(filepath):
             if os.path.exists(filepath):
