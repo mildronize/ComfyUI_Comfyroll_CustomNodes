@@ -478,6 +478,30 @@ class CR_YamlFrontmatter:
         return (text, show_help, )
 
 #---------------------------------------------------------------------------------------------------------------------#
+class CR_DateTime:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "format": ("STRING", {"multiline": False, "default": "[time(%Y-%m-%d %H:%M:%S)]"}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "STRING", )
+    RETURN_NAMES = ("text", "show_help", )
+    FUNCTION = "format_datetime"
+    CATEGORY = icons.get("Comfyroll/Utils/Text")
+
+    @classmethod
+    def IS_CHANGED(cls, format):
+        return time.time()
+
+    def format_datetime(self, format):
+        show_help = "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/wiki/List-Nodes#cr-datetime"
+        return (_parse_time_tokens(format), show_help, )
+
+#---------------------------------------------------------------------------------------------------------------------#
 # MAPPINGS
 #---------------------------------------------------------------------------------------------------------------------#
 # For reference only, actual mappings are in __init__.py
@@ -495,6 +519,7 @@ NODE_CLASS_MAPPINGS = {
     "CR Save Text To File": CR_SaveTextToFile,
     "CR Text Hash": CR_TextHash,
     "CR Yaml Frontmatter": CR_YamlFrontmatter,
+    "CR DateTime": CR_DateTime,
 }
 '''
 
