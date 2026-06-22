@@ -222,6 +222,7 @@ NODE_CLASS_MAPPINGS = {
     "CR Text Blacklist": CR_TextBlacklist,      
     "CR Save Text To File": CR_SaveTextToFile,
     "CR Text Hash": CR_TextHash,
+    "CR Yaml Frontmatter": CR_YamlFrontmatter,
     ### Utils Conditional
     "CR Set Value On Boolean": CR_SetValueOnBoolean,
     "CR Set Value On Binary": CR_SetValueOnBinary, 
@@ -467,6 +468,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "CR Text Operation": "🔤 CR Text Operation", 
     "CR Save Text To File": "🔤 CR Save Text To File",
     "CR Text Hash": "🔤 CR Text Hash",
+    "CR Yaml Frontmatter": "🔤 CR Yaml Frontmatter",
     ### Utils Conditional
     "CR Set Value On Boolean": "⚙️ CR Set Value On Boolean",
     "CR Set Value On Binary": "⚙️ CR Set Value On Binary",

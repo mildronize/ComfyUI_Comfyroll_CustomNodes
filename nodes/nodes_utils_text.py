@@ -405,6 +405,76 @@ class CR_TextHash:
         return (digest, show_help, )
 
 #---------------------------------------------------------------------------------------------------------------------#
+class CR_YamlFrontmatter:
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "body": ("STRING", {"multiline": True, "default": ""}),
+            },
+            "optional": {
+                "categories": ("STRING", {"multiline": False, "default": ""}),
+                "models": ("STRING", {"multiline": False, "default": ""}),
+                "loras": ("STRING", {"multiline": True, "default": ""}),
+                "negative": ("STRING", {"multiline": False, "default": ""}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "STRING", )
+    RETURN_NAMES = ("text", "show_help", )
+    FUNCTION = "build"
+    CATEGORY = icons.get("Comfyroll/Utils/Text")
+
+    @staticmethod
+    def _split_csv(s):
+        return [p.strip() for p in s.split(",") if p.strip()]
+
+    @staticmethod
+    def _yaml_escape(s):
+        if any(c in s for c in [':', '#', '"', "'", '\n', ',', '[', ']', '{', '}']):
+            return '"' + s.replace('\\', '\\\\').replace('"', '\\"') + '"'
+        return s
+
+    def build(self, body, categories="", models="", loras="", negative=""):
+
+        show_help = "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/wiki/List-Nodes#cr-yaml-frontmatter"
+
+        lines = ["---"]
+
+        cats = self._split_csv(categories)
+        if cats:
+            lines.append("categories: [" + ", ".join(cats) + "]")
+
+        mdls = self._split_csv(models)
+        if mdls:
+            lines.append("models: [" + ", ".join(mdls) + "]")
+
+        lora_entries = []
+        for raw in loras.splitlines():
+            raw = raw.strip()
+            if not raw or raw.startswith("#"):
+                continue
+            if ":" in raw:
+                name, weight = raw.split(":", 1)
+                lora_entries.append((name.strip(), weight.strip()))
+            else:
+                lora_entries.append((raw, "1.0"))
+
+        if lora_entries:
+            lines.append("loras:")
+            for name, weight in lora_entries:
+                lines.append("  - { name: " + name + ", weight: " + weight + " }")
+
+        if negative:
+            lines.append("negative: " + self._yaml_escape(negative))
+
+        lines.append("---")
+        text = "\n".join(lines) + "\n" + body
+
+        return (text, show_help, )
+
+#---------------------------------------------------------------------------------------------------------------------#
 # MAPPINGS
 #---------------------------------------------------------------------------------------------------------------------#
 # For reference only, actual mappings are in __init__.py
@@ -421,6 +491,7 @@ NODE_CLASS_MAPPINGS = {
     "CR Text Operation": CR_TextOperation, 
     "CR Save Text To File": CR_SaveTextToFile,
     "CR Text Hash": CR_TextHash,
+    "CR Yaml Frontmatter": CR_YamlFrontmatter,
 }
 '''
 
