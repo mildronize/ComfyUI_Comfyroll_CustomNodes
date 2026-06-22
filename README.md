@@ -24,6 +24,71 @@ You can also install the nodes using the following methods:
 
 https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/blob/main/Patch_Notes.md
 
+# Usage: Custom Text Utility Nodes
+
+## 🔤 CR Save Text To File
+
+Saves a multiline string to a file on disk.
+
+Inputs:
+- `multiline_text` — text to write.
+- `output_file_path` — directory to write into. Supports `[time(fmt)]` tokens (any `strftime` format), e.g. `/data/logs/[time(%Y-%m-%d)]`. Directory is created if missing. Works on Linux, macOS, and Windows.
+- `file_name` — base file name (no extension). Also supports `[time(fmt)]` tokens, e.g. `run_[time(%H%M%S)]`.
+- `file_extension` — `txt`, `csv`, or `md`.
+
+Behavior: if the target file already exists, an `_1`, `_2`, … suffix is appended. `csv` writes one line per row via `csv.writer`; `txt`/`md` write the text as-is.
+
+Example: `output_file_path = /workspace/out/[time(%Y-%m-%d)]`, `file_name = prompt`, `file_extension = md` produces `/workspace/out/2026-06-22/prompt.md`.
+
+## 🔤 CR Text Hash
+
+Hashes up to four input strings and returns the hex digest.
+
+Inputs:
+- `algorithm` — `sha256` (default), `sha1`, `sha512`, or `md5`.
+- `length` — number of hex characters to keep (`0` = full digest).
+- `text1`..`text4` *(optional, forceInput)* — strings to hash. Empty inputs are skipped.
+- `separator` *(optional)* — joined between non-empty inputs before hashing.
+
+Example: `text1 = "cat"`, `text2 = "dog"`, `separator = "|"`, `algorithm = sha256`, `length = 12` → hash of `"cat|dog"` truncated to 12 chars. Useful for building deterministic filenames or cache keys from prompt fragments — pair with **CR Save Text To File** by feeding the hash into `file_name`.
+
+## 🔤 CR Yaml Frontmatter
+
+Builds a Markdown/YAML document with a frontmatter header and a body. Useful for writing prompt logs together with metadata.
+
+Inputs:
+- `body` *(required, multiline)* — content placed after the closing `---`.
+- `categories` *(optional)* — comma-separated, emitted as a flow-style list.
+- `models` *(optional)* — comma-separated, emitted as a flow-style list.
+- `loras` *(optional, multiline)* — one `name:weight` per line. Lines starting with `#` are skipped; lines without `:` default to weight `1.0`.
+- `negative` *(optional)* — emitted as a quoted string when it contains special characters.
+
+Any empty optional field is omitted from the output.
+
+Example inputs:
+- `categories`: `hands, girl`
+- `models`: `anima`
+- `loras`:
+  ```
+  gpt-style:0.8
+  ```
+- `negative`: `blurry, lowres, deformed`
+- `body`: `cinematic portrait, 1girl, head tilt, neutral expression, slightly parted lips, looking at the man, soft blush`
+
+Output:
+```yaml
+---
+categories: [hands, girl]
+models: [anima]
+loras:
+  - { name: gpt-style, weight: 0.8 }
+negative: "blurry, lowres, deformed"
+---
+cinematic portrait, 1girl, head tilt, neutral expression, slightly parted lips, looking at the man, soft blush
+```
+
+Typical pipeline: **CR Yaml Frontmatter** → **CR Text Hash** (hash the body for a filename) → **CR Save Text To File** with `file_extension = md`.
+
 # List of Custom Nodes
   
 ## Core Nodes
