@@ -148,7 +148,7 @@ class CR_SaveTextToFile:
                         "multiline_text": ("STRING", {"multiline": True, "default": ""}),
                         "output_file_path": ("STRING", {"multiline": False, "default": ""}),
                         "file_name": ("STRING", {"multiline": False, "default": ""}),
-                        "file_extension": (["txt", "csv"],),
+                        "file_extension": (["txt", "csv", "md"],),
                         }
         }
         
@@ -162,7 +162,7 @@ class CR_SaveTextToFile:
     
         show_help =  "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes/wiki/List-Nodes#cr-save-text-to-file" 
     
-        filepath = output_file_path + "\\" + file_name + "." + file_extension
+        filepath = os.path.join(output_file_path, file_name + "." + file_extension)
  
         index = 1
 
@@ -172,7 +172,7 @@ class CR_SaveTextToFile:
 
         while os.path.exists(filepath):
             if os.path.exists(filepath):
-                filepath = output_file_path + "\\" + file_name + "_" + str(index) + "." + file_extension
+                filepath = os.path.join(output_file_path, file_name + "_" + str(index) + "." + file_extension)
                 index = index + 1
             else:
                 break            
